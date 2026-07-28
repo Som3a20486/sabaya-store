@@ -37,12 +37,11 @@ export default function Products() {
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map((product) => (
           <ProductCard
-            key={product.id}
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            image={product.image}
-          />
+  id={product.id}
+  name={product.name}
+  price={Number(product.price)}
+  image={product.image}
+/>
         ))}
       </div>
     </section>

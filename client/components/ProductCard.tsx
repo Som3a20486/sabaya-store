@@ -9,7 +9,7 @@ import { useCart } from "../context/CartContext";
 type Product = {
   id: number;
   name: string;
-  price: number;
+  price: number | string;
   image: string;
   images?: string[];
 };
@@ -532,7 +532,7 @@ export default function ProductCard({
         mt-5
         ">
 
-          {price}
+         {Number(price).toLocaleString("ar-EG")}
 
         </p>
 
@@ -551,18 +551,18 @@ export default function ProductCard({
 
             addToCart({
 
-              id,
+  id,
 
-              name,
+  name,
 
-              price,
+  price: Number(price),
 
-              image:
-              productImages[currentImage] || image,
+  image:
+  productImages[currentImage] || image,
 
-              quantity:1,
+  quantity: 1,
 
-            })
+})
 
 
           }

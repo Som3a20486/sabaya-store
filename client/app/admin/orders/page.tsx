@@ -6,12 +6,11 @@ import { supabase } from "@/lib/supabase";
 
 type OrderProduct = {
   name: string;
-  price: string;
+  price: number;
   quantity: number;
   selectedSize?: string;
   selectedColor?: string;
 };
-
 
 type Order = {
   id: number;

@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
+import { CartItem } from "@/context/CartContext";
 
 
 type Product = {
@@ -206,26 +207,15 @@ function ProductContent(){
 
 
 
-    addToCart({
-
-      id:product.id,
-
-      name:product.name,
-
-      price:product.price,
-
-      image:activeImage,
-
-      quantity:1,
-
-      selectedSize,
-
-      selectedColor
-
-    });
-
-
-
+ addToCart({
+  id: product.id,
+  name: product.name,
+  price: product.price,
+  image: activeImage,
+  quantity: 1,
+  selectedSize,
+  selectedColor,
+});
 
 
 
