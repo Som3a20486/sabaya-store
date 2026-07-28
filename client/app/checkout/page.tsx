@@ -6,7 +6,8 @@ import { supabase } from "@/lib/supabase";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import ShippingLabel from "@/components/ShippingLabel";
-
+import { toast } from "sonner";
+import { Toaster } from "sonner";
 
 
 export default function CheckoutPage(){
@@ -141,7 +142,7 @@ export default function CheckoutPage(){
 
     if(cart.length === 0){
 
-      alert("السلة فارغة");
+      toast.error("🛒 السلة فارغة");
 
       return;
 
@@ -159,7 +160,7 @@ export default function CheckoutPage(){
       !governorate
     ){
 
-      alert("من فضلك أكمل بيانات العميل");
+     toast.error("⚠️ من فضلك أكمل جميع البيانات");
 
       return;
 
@@ -245,9 +246,7 @@ export default function CheckoutPage(){
       console.log(orderError);
 
 
-      alert(
-        "حدث خطأ أثناء إنشاء الطلب"
-      );
+toast.error("❌ حدث خطأ أثناء إنشاء الطلب");
 
 
       setLoading(false);
@@ -297,7 +296,7 @@ export default function CheckoutPage(){
     // انتظار ظهور البوليصة في الصفحة
 
 
-    setTimeout(async()=>{
+    setTimeout(async () => {
 
 
 
@@ -443,12 +442,7 @@ export default function CheckoutPage(){
 
 
 
-
-      alert(
-
-        "تم تأكيد الطلب بنجاح ✅"
-
-      );
+toast.success("🎉 تم تأكيد الطلب بنجاح");
 
 
 
@@ -458,7 +452,7 @@ export default function CheckoutPage(){
 
 
 
-    },800);
+    }, 800);
 
 
 

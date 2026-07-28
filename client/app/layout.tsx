@@ -4,6 +4,7 @@ import Providers from "@/components/Providers";
 import Header from "@/components/Header";
 import { Cairo } from "next/font/google";
 import ContactBubble from "@/components/ContactBubble";
+import { Toaster } from "sonner";
 
 
 const cairo = Cairo({
@@ -23,6 +24,7 @@ const cairo = Cairo({
 
 
 
+
 export const metadata: Metadata = {
 
   title:"Sabaya Store",
@@ -30,6 +32,8 @@ export const metadata: Metadata = {
   description:"متجر صبايا للأزياء والإكسسوارات",
 
 };
+
+
 
 
 
@@ -51,23 +55,36 @@ export default function RootLayout({
 
   return (
 
+
     <html lang="ar" dir="rtl">
+
 
 
       <body className={cairo.className}>
 
 
-       <Providers>
+        <Providers>
 
-<ContactBubble />
 
-<nav>
-...
-</nav>
+          <ContactBubble />
 
 
 
           <Header />
+
+
+
+          <Toaster
+
+            position="top-center"
+
+            richColors
+
+            duration={3000}
+
+          />
+
+
 
 
 
@@ -76,6 +93,8 @@ export default function RootLayout({
             {children}
 
           </main>
+
+
 
 
 
@@ -104,11 +123,14 @@ export default function RootLayout({
 
 
 
+
             <p className="mt-3">
 
               أناقة تبدأ من هنا 💗
 
             </p>
+
+
 
 
 
@@ -124,6 +146,7 @@ export default function RootLayout({
 
 
 
+
           </footer>
 
 
@@ -134,11 +157,13 @@ export default function RootLayout({
 
 
 
+
       </body>
 
 
 
     </html>
+
 
   );
 

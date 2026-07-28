@@ -20,6 +20,8 @@ type Product = {
 
   image:string;
 
+  images?:string[];
+
   sizes?:string[];
 
   colors?:string[];
@@ -30,6 +32,337 @@ type Product = {
 
 
 
+
+
+
+
+function ProductImageSlider({
+
+  images,
+
+  fallback,
+
+  alt,
+
+}:{
+
+  images?:string[];
+
+  fallback:string;
+
+  alt:string;
+
+}){
+
+
+
+  const productImages =
+
+    images && images.length > 0
+
+    ? images
+
+    : fallback
+
+    ? [fallback]
+
+    : [];
+
+
+
+
+
+
+
+  const [current,setCurrent] = useState(0);
+
+
+
+
+
+
+
+
+  function next(){
+
+
+    if(productImages.length <= 1)
+
+      return;
+
+
+
+    setCurrent(prev =>
+
+      prev === productImages.length - 1
+
+      ? 0
+
+      : prev + 1
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+
+
+  function prev(){
+
+
+    if(productImages.length <= 1)
+
+      return;
+
+
+
+    setCurrent(prev =>
+
+      prev === 0
+
+      ? productImages.length - 1
+
+      : prev - 1
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+
+
+  useEffect(()=>{
+
+
+    if(productImages.length <= 1)
+
+      return;
+
+
+
+
+    const interval = setInterval(()=>{
+
+
+      next();
+
+
+
+    },3000);
+
+
+
+
+
+
+    return ()=>clearInterval(interval);
+
+
+
+  },[productImages.length]);
+
+
+
+
+
+
+
+
+
+
+
+
+  return (
+
+
+    <div className="relative overflow-hidden">
+
+
+
+
+
+
+
+      <img
+
+      src={productImages[current]}
+
+      alt={alt}
+
+      className="
+      w-full
+      h-72
+      object-cover
+      transition-all
+      duration-700
+      "
+
+      />
+
+
+
+
+
+
+
+
+
+      {
+        productImages.length > 1 &&
+
+        <>
+
+
+
+
+
+          <button
+
+          onClick={next}
+
+          className="
+          absolute
+          right-3
+          top-1/2
+          -translate-y-1/2
+          bg-white/90
+          shadow-lg
+          w-10
+          h-10
+          rounded-full
+          text-xl
+          font-bold
+          z-10
+          "
+
+          >
+
+            ❯
+
+          </button>
+
+
+
+
+
+
+
+
+          <button
+
+          onClick={prev}
+
+          className="
+          absolute
+          left-3
+          top-1/2
+          -translate-y-1/2
+          bg-white/90
+          shadow-lg
+          w-10
+          h-10
+          rounded-full
+          text-xl
+          font-bold
+          z-10
+          "
+
+          >
+
+            ❮
+
+          </button>
+
+
+
+
+
+
+
+
+
+          <div className="
+          absolute
+          bottom-3
+          left-0
+          right-0
+          flex
+          justify-center
+          gap-2
+          ">
+
+
+
+            {
+              productImages.map((_,index)=>(
+
+
+                <button
+
+                key={index}
+
+                onClick={()=>setCurrent(index)}
+
+                className={`
+                w-2
+                h-2
+                rounded-full
+
+                ${
+                  current === index
+                  ?
+                  "bg-pink-600"
+                  :
+                  "bg-white"
+                }
+
+                `}
+
+                />
+
+
+              ))
+
+            }
+
+
+
+          </div>
+
+
+
+
+
+
+
+        </>
+
+
+      }
+
+
+
+
+
+    </div>
+
+
+  );
+
+
+}
 export default function HomePage(){
 
 
@@ -43,6 +376,7 @@ export default function HomePage(){
   const [loading,setLoading] =
 
     useState(true);
+
 
 
 
@@ -65,11 +399,12 @@ export default function HomePage(){
 
 
 
+
   async function getProducts(){
 
 
 
-    const {data,error} =
+    const {data,error}=
 
       await supabase
 
@@ -88,18 +423,27 @@ export default function HomePage(){
 
 
 
+
     if(error){
 
+
       console.log(
+
         "Products Error:",
+
         error
+
       );
+
 
       setLoading(false);
 
       return;
 
+
     }
+
+
 
 
 
@@ -108,11 +452,16 @@ export default function HomePage(){
 
     if(data){
 
+
       setProducts(
+
         data as Product[]
+
       );
 
+
     }
+
 
 
 
@@ -130,7 +479,13 @@ export default function HomePage(){
 
 
 
+
+
+
+
+
   if(loading){
+
 
 
     return (
@@ -174,6 +529,9 @@ export default function HomePage(){
 
 
 
+
+
+
       <section className="
       text-center
       py-14
@@ -198,6 +556,7 @@ export default function HomePage(){
 
 
 
+
         <p className="
         text-xl
         mt-5
@@ -212,6 +571,8 @@ export default function HomePage(){
 
 
 
+
+
         <p className="
         mt-3
         text-gray-600
@@ -220,6 +581,9 @@ export default function HomePage(){
           أحدث صيحات الموضة والحقائب والأحذية والإكسسوارات
 
         </p>
+
+
+
 
 
 
@@ -248,6 +612,7 @@ export default function HomePage(){
 
 
 
+
       </section>
 
 
@@ -271,6 +636,7 @@ export default function HomePage(){
           أحدث المنتجات
 
         </h2>
+
 
 
 
@@ -307,6 +673,7 @@ export default function HomePage(){
 
 
 
+
           <div className="
           grid
           md:grid-cols-4
@@ -315,129 +682,129 @@ export default function HomePage(){
 
 
 
+
+
           {
-            products.map(product=>(
 
-
-              <div
-
-              key={product.id}
-
-              className="
-              bg-white
-              rounded-3xl
-              shadow
-              overflow-hidden
-              hover:shadow-xl
-              transition
-              "
-
-              >
+          products.map(product=>(
 
 
 
+            <div
+
+            key={product.id}
+
+            className="
+            bg-white
+            rounded-3xl
+            shadow
+            overflow-hidden
+            hover:shadow-xl
+            transition
+            "
+
+            >
 
 
 
-                <img
 
-                src={product.image}
 
-                alt={product.name}
+
+              <ProductImageSlider
+
+
+              images={product.images}
+
+
+              fallback={product.image}
+
+
+              alt={product.name}
+
+
+              />
+
+
+
+
+
+
+
+
+
+              <div className="p-5">
+
+
+
+
+
+
+                <p className="
+                text-pink-600
+                text-sm
+                ">
+
+                  {product.category}
+
+                </p>
+
+
+
+
+
+
+
+                <h3 className="
+                text-xl
+                font-bold
+                mt-2
+                ">
+
+                  {product.name}
+
+                </h3>
+
+
+
+
+
+
+
+                <p className="
+                font-bold
+                text-lg
+                mt-3
+                ">
+
+                  {product.price} جنيه
+
+                </p>
+
+
+
+
+
+
+
+                <Link
+
+                href={`/product?id=${product.id}`}
 
                 className="
-                w-full
-                h-72
-                object-cover
+                block
+                text-center
+                mt-5
+                bg-black
+                text-white
+                py-3
+                rounded-xl
                 "
 
-                />
+                >
 
+                  عرض المنتج
 
-
-
-
-
-
-
-
-                <div className="p-5">
-
-
-
-
-
-                  <p className="
-                  text-pink-600
-                  text-sm
-                  ">
-
-                    {product.category}
-
-                  </p>
-
-
-
-
-
-
-                  <h3 className="
-                  text-xl
-                  font-bold
-                  mt-2
-                  ">
-
-                    {product.name}
-
-                  </h3>
-
-
-
-
-
-
-
-                  <p className="
-                  font-bold
-                  text-lg
-                  mt-3
-                  ">
-
-                    {product.price} جنيه
-
-                  </p>
-
-
-
-
-
-
-
-                  <Link
-
-                  href={`/product?id=${product.id}`}
-
-                  className="
-                  block
-                  text-center
-                  mt-5
-                  bg-black
-                  text-white
-                  py-3
-                  rounded-xl
-                  "
-
-                  >
-
-                    عرض المنتج
-
-                  </Link>
-
-
-
-
-
-                </div>
+                </Link>
 
 
 
@@ -448,13 +815,25 @@ export default function HomePage(){
 
 
 
-            ))
+
+
+
+
+            </div>
+
+
+
+          ))
 
           }
 
 
 
+
+
           </div>
+
+
 
 
 
@@ -463,7 +842,12 @@ export default function HomePage(){
 
 
 
+
+
+
       </section>
+
+
 
 
 

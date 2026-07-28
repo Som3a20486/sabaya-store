@@ -23,6 +23,8 @@ export default function AddProductPage(){
 
   const [image,setImage] = useState("");
 
+  const [images,setImages] = useState<string[]>([]);
+
   const [sizes,setSizes] = useState("");
 
   const [colors,setColors] = useState("");
@@ -36,15 +38,16 @@ export default function AddProductPage(){
 
 
 
-  async function uploadImage(
+
+  async function uploadImages(
     e:React.ChangeEvent<HTMLInputElement>
   ){
 
 
-    const file = e.target.files?.[0];
+    const files = e.target.files;
 
 
-    if(!file) return;
+    if(!files || files.length === 0) return;
 
 
 
@@ -56,35 +59,59 @@ export default function AddProductPage(){
 
 
 
-      const fileName =
-      `${Date.now()}-${file.name}`;
+      const uploadedImages:string[] = [];
+
+
+
+
+      for(const file of Array.from(files)){
+
+
+        const fileName =
+        `${Date.now()}-${file.name}`;
+
+
+
+        const {error} = await supabase.storage
+
+          .from("product-images")
+
+          .upload(
+            fileName,
+            file
+          );
+
+
+
+
+        if(error){
+
+          console.log(error);
+
+          alert("فشل رفع صورة");
+
+          continue;
+
+        }
 
 
 
 
 
-      const {error} =
-      await supabase.storage
 
-      .from("product-images")
+        const {data} = supabase.storage
 
-      .upload(
-        fileName,
-        file
-      );
+          .from("product-images")
+
+          .getPublicUrl(fileName);
 
 
 
 
+        uploadedImages.push(
+          data.publicUrl
+        );
 
-
-      if(error){
-
-        console.log(error);
-
-        alert("فشل رفع الصورة");
-
-        return;
 
       }
 
@@ -94,21 +121,26 @@ export default function AddProductPage(){
 
 
 
-      const {data} =
-      supabase.storage
+      setImages(prev=>[
 
-      .from("product-images")
+        ...prev,
 
-      .getPublicUrl(fileName);
+        ...uploadedImages
 
-
-
+      ]);
 
 
 
-      setImage(
-        data.publicUrl
-      );
+
+      if(!image && uploadedImages.length > 0){
+
+        setImage(
+          uploadedImages[0]
+        );
+
+      }
+
+
 
 
 
@@ -130,6 +162,7 @@ export default function AddProductPage(){
 
 
 
+
   async function addProduct(
     e:React.FormEvent
   ){
@@ -138,53 +171,74 @@ export default function AddProductPage(){
     e.preventDefault();
 
 
-
     setLoading(true);
 
 
 
 
 
-    const {error}=await supabase
 
-    .from("products")
+    const {error} = await supabase
 
-    .insert([
+      .from("products")
 
-      {
+      .insert([
 
-
-        name,
-
-        price:Number(price),
-
-        description,
-
-        category,
-
-        image,
+        {
 
 
-        sizes:
-        sizes
-        ?
-        sizes.split(",")
-        :
-        [],
+          name,
+
+          price:Number(price),
+
+          description,
+
+          category,
+
+
+          image,
+
+
+          images,
 
 
 
-        colors:
-        colors
-        ?
-        colors.split(",")
-        :
-        []
+          sizes:
 
-      }
+          sizes
+
+          ?
+
+          sizes
+          .split(",")
+          .map(x=>x.trim())
+
+          :
+
+          [],
 
 
-    ]);
+
+
+
+          colors:
+
+          colors
+
+          ?
+
+          colors
+          .split(",")
+          .map(x=>x.trim())
+
+          :
+
+          []
+
+        }
+
+
+      ]);
 
 
 
@@ -207,6 +261,7 @@ export default function AddProductPage(){
 
 
 
+
     alert(
       "تم إضافة المنتج بنجاح ✅"
     );
@@ -218,16 +273,24 @@ export default function AddProductPage(){
     );
 
 
-
   }
-    return (
 
+
+
+
+
+
+
+
+
+  return (
 
     <main className="
     min-h-screen
     bg-gray-50
     p-6
     ">
+
 
 
 
@@ -246,6 +309,8 @@ export default function AddProductPage(){
 
 
 
+
+
       <div className="
       grid
       lg:grid-cols-2
@@ -256,20 +321,14 @@ export default function AddProductPage(){
 
 
 
-        {/* معاينة العميل */}
+
+
+
+        {/* المعاينة */}
+
 
 
         <motion.div
-
-        initial={{
-          opacity:0,
-          x:-50
-        }}
-
-        animate={{
-          opacity:1,
-          x:0
-        }}
 
         className="
         bg-white
@@ -299,27 +358,21 @@ export default function AddProductPage(){
 
 
 
-          <motion.div
-
-          layout
-
-          className="
+          <div className="
           max-w-sm
           mx-auto
           border
           rounded-3xl
           overflow-hidden
           shadow
-          "
-
-          >
-
+          ">
 
 
 
 
             {
               image ?
+
 
               <img
 
@@ -335,6 +388,7 @@ export default function AddProductPage(){
 
               :
 
+
               <div className="
               h-72
               bg-gray-100
@@ -348,8 +402,8 @@ export default function AddProductPage(){
 
               </div>
 
-            }
 
+            }
 
 
 
@@ -360,16 +414,11 @@ export default function AddProductPage(){
             <div className="p-5">
 
 
-
-              <p className="
-              text-pink-600
-              ">
+              <p className="text-pink-600">
 
                 {category}
 
               </p>
-
-
 
 
 
@@ -382,8 +431,6 @@ export default function AddProductPage(){
                 {name || "اسم المنتج"}
 
               </h3>
-
-
 
 
 
@@ -404,173 +451,21 @@ export default function AddProductPage(){
 
 
 
-
-
-
-              <p className="
-              text-gray-600
-              mt-3
-              ">
-
-                {
-                  description ||
-                  "وصف المنتج يظهر هنا"
-                }
-
-              </p>
-
-
-
-
-
-
-
               {
-                sizes &&
+                images.length > 0 &&
 
-                <div className="mt-5">
+                <p className="
+                text-gray-500
+                mt-3
+                ">
 
+                  عدد الصور:
+                  {" "}
+                  {images.length}
 
-                  <p className="font-bold">
-
-                    المقاسات
-
-                  </p>
-
-
-                  <div className="
-                  flex
-                  gap-2
-                  flex-wrap
-                  mt-2
-                  ">
-
-
-                  {
-                    sizes.split(",").map(
-                      (size,index)=>(
-
-
-                      <span
-
-                      key={index}
-
-                      className="
-                      border
-                      rounded-lg
-                      px-3
-                      py-1
-                      "
-
-                      >
-
-                        {size}
-
-                      </span>
-
-
-                    ))
-
-                  }
-
-
-                  </div>
-
-
-                </div>
+                </p>
 
               }
-
-
-
-
-
-
-
-
-              {
-                colors &&
-
-                <div className="mt-5">
-
-
-                  <p className="font-bold">
-
-                    الألوان
-
-                  </p>
-
-
-
-                  <div className="
-                  flex
-                  gap-2
-                  flex-wrap
-                  mt-2
-                  ">
-
-
-                  {
-                    colors.split(",").map(
-                      (color,index)=>(
-
-
-                      <span
-
-                      key={index}
-
-                      className="
-                      bg-pink-100
-                      rounded-full
-                      px-3
-                      py-1
-                      "
-
-                      >
-
-                        {color}
-
-                      </span>
-
-
-                    ))
-
-                  }
-
-
-                  </div>
-
-
-
-                </div>
-
-              }
-
-
-
-
-
-
-
-
-              <button
-
-              className="
-              w-full
-              bg-pink-600
-              text-white
-              py-3
-              rounded-xl
-              mt-6
-              "
-
-              >
-
-                🛒 أضف للسلة
-
-              </button>
-
-
 
 
 
@@ -580,7 +475,8 @@ export default function AddProductPage(){
 
 
 
-          </motion.div>
+
+          </div>
 
 
 
@@ -596,8 +492,7 @@ export default function AddProductPage(){
 
 
 
-
-        {/* فورم الإدخال */}
+        {/* الفورم */}
 
 
 
@@ -618,23 +513,15 @@ export default function AddProductPage(){
 
 
 
-
           <input
 
-          className="
-          border
-          rounded-xl
-          p-4
-          w-full
-          "
+          className="border rounded-xl p-4 w-full"
 
           placeholder="اسم المنتج"
 
           value={name}
 
-          onChange={(e)=>
-            setName(e.target.value)
-          }
+          onChange={(e)=>setName(e.target.value)}
 
           required
 
@@ -645,25 +532,17 @@ export default function AddProductPage(){
 
 
 
-
           <input
 
           type="number"
 
-          className="
-          border
-          rounded-xl
-          p-4
-          w-full
-          "
+          className="border rounded-xl p-4 w-full"
 
           placeholder="السعر"
 
           value={price}
 
-          onChange={(e)=>
-            setPrice(e.target.value)
-          }
+          onChange={(e)=>setPrice(e.target.value)}
 
           required
 
@@ -677,20 +556,13 @@ export default function AddProductPage(){
 
           <textarea
 
-          className="
-          border
-          rounded-xl
-          p-4
-          w-full
-          "
+          className="border rounded-xl p-4 w-full"
 
           placeholder="وصف المنتج"
 
           value={description}
 
-          onChange={(e)=>
-            setDescription(e.target.value)
-          }
+          onChange={(e)=>setDescription(e.target.value)}
 
           />
 
@@ -700,43 +572,23 @@ export default function AddProductPage(){
 
 
 
-
           <select
 
-          className="
-          border
-          rounded-xl
-          p-4
-          w-full
-          "
+          className="border rounded-xl p-4 w-full"
 
           value={category}
 
-          onChange={(e)=>
-            setCategory(e.target.value)
-          }
+          onChange={(e)=>setCategory(e.target.value)}
 
           >
 
+            <option>ملابس</option>
 
-            <option>
-              ملابس
-            </option>
+            <option>أحذية</option>
 
+            <option>شنط</option>
 
-            <option>
-              أحذية
-            </option>
-
-
-            <option>
-              شنط
-            </option>
-
-
-            <option>
-              إكسسوارات
-            </option>
+            <option>إكسسوارات</option>
 
 
           </select>
@@ -755,16 +607,11 @@ export default function AddProductPage(){
           ">
 
 
-            <label className="
-            font-bold
-            block
-            mb-3
-            ">
+            <label className="font-bold block mb-3">
 
-              صورة المنتج
+              صور المنتج
 
             </label>
-
 
 
 
@@ -774,10 +621,11 @@ export default function AddProductPage(){
 
             accept="image/*"
 
-            onChange={uploadImage}
+            multiple
+
+            onChange={uploadImages}
 
             />
-
 
 
 
@@ -785,12 +633,9 @@ export default function AddProductPage(){
             {
               uploading &&
 
-              <p className="
-              text-pink-600
-              mt-3
-              ">
+              <p className="text-pink-600 mt-3">
 
-                جاري رفع الصورة...
+                جاري رفع الصور...
 
               </p>
 
@@ -807,23 +652,15 @@ export default function AddProductPage(){
 
 
 
-
           <input
 
-          className="
-          border
-          rounded-xl
-          p-4
-          w-full
-          "
+          className="border rounded-xl p-4 w-full"
 
-          placeholder="المقاسات: S,M,L أو 38,39,40"
+          placeholder="المقاسات: S,M,L"
 
           value={sizes}
 
-          onChange={(e)=>
-            setSizes(e.target.value)
-          }
+          onChange={(e)=>setSizes(e.target.value)}
 
           />
 
@@ -836,20 +673,13 @@ export default function AddProductPage(){
 
           <input
 
-          className="
-          border
-          rounded-xl
-          p-4
-          w-full
-          "
+          className="border rounded-xl p-4 w-full"
 
-          placeholder="الألوان: أسود,بيج,أبيض"
+          placeholder="الألوان: أسود,أبيض"
 
           value={colors}
 
-          onChange={(e)=>
-            setColors(e.target.value)
-          }
+          onChange={(e)=>setColors(e.target.value)}
 
           />
 
@@ -875,7 +705,6 @@ export default function AddProductPage(){
 
           >
 
-
             {
               loading
               ?
@@ -886,6 +715,7 @@ export default function AddProductPage(){
 
 
           </button>
+
 
 
 
@@ -904,8 +734,8 @@ export default function AddProductPage(){
 
 
 
-    </main>
 
+    </main>
 
   );
 

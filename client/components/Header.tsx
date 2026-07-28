@@ -2,30 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useCart } from "@/context/CartContext";
 
 
 export default function Header(){
 
 
+  const { cart } = useCart();
+
+
   const [cartCount,setCartCount] = useState(0);
-
-
-
-  function updateCart(){
-
-
-    const cart = JSON.parse(
-
-      localStorage.getItem("cart") || "[]"
-
-    );
-
-
-    setCartCount(cart.length);
-
-
-  }
-
 
 
 
@@ -34,30 +20,22 @@ export default function Header(){
   useEffect(()=>{
 
 
-    updateCart();
+    const total = cart.reduce(
 
+      (sum,item)=>
 
+      sum + item.quantity,
 
-    window.addEventListener(
-      "cartUpdated",
-      updateCart
+      0
+
     );
 
 
-
-    return ()=>{
-
-
-      window.removeEventListener(
-        "cartUpdated",
-        updateCart
-      );
+    setCartCount(total);
 
 
-    };
 
-
-  },[]);
+  },[cart]);
 
 
 
@@ -67,6 +45,7 @@ export default function Header(){
 
 
   return (
+
 
     <nav className="
     bg-white
@@ -103,6 +82,7 @@ export default function Header(){
 
 
 
+
       <div className="
       flex
       gap-6
@@ -111,11 +91,14 @@ export default function Header(){
       ">
 
 
+
         <Link href="/">
 
           الرئيسية
 
         </Link>
+
+
 
 
 
@@ -128,6 +111,10 @@ export default function Header(){
 
 
 
+
+
+
+
         <Link
 
         href="/cart"
@@ -136,12 +123,17 @@ export default function Header(){
 
         >
 
+
           🛒 السلة
+
+
+
 
 
 
           {
             cartCount > 0 &&
+
 
             <span className="
             absolute
@@ -158,11 +150,18 @@ export default function Header(){
             text-sm
             ">
 
+
               {cartCount}
+
+
 
             </span>
 
+
           }
+
+
+
 
 
 
@@ -171,11 +170,15 @@ export default function Header(){
 
 
 
+
       </div>
 
 
 
+
+
     </nav>
+
 
   );
 

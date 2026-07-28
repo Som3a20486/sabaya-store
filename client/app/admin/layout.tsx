@@ -118,15 +118,16 @@ export default function AdminLayout({
 
 
 
-        <h1 className="
-        text-2xl
-        font-black
-        text-pink-600
-        ">
+       
 
-          ✦ Sabaya Store ✦
 
-        </h1>
+
+<Link
+  href="/"
+  className="text-2xl font-bold text-pink-600 hover:text-pink-700 transition"
+>
+  ✦ Sabaya Store ✦
+</Link> 
 
 
 
