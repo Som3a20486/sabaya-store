@@ -1,108 +1,106 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-
 type Product = {
-
-  id:number;
-
-  name:string;
-
-  price:number;
-
-  description:string;
-
-  category:string;
-
-  image:string;
-
-  sizes?:string[];
-
-  colors?:string[];
-
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  image: string;
+  sizes?: string[];
+  colors?: string[];
 };
 
+const categories = [
+  "الكل",
+  "ملابس",
+  "أحذية",
+  "حقائب",
+  "إكسسوارات",
+  "إلكترونيات",
+];
+
+
+function ProductsContent() {
+
+  const searchParams = useSearchParams();
+
+  const selectedCategory =
+    searchParams.get("category") || "الكل";
+
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
 
 
-export default function ProductsPage(){
-
-
-  const [products,setProducts] = useState<Product[]>([]);
-
-  const [loading,setLoading] = useState(true);
-
-
-
-
-  useEffect(()=>{
-
+  useEffect(() => {
     getProducts();
-
-  },[]);
-
+  }, []);
 
 
 
+  async function getProducts() {
 
-
-  async function getProducts(){
-
-
-    const {data,error}=
-
-      await supabase
-
+    const { data, error } = await supabase
       .from("products")
-
       .select("*")
-
-      .order("id",{
-        ascending:false
+      .order("id", {
+        ascending: false,
       });
 
 
-
-
-    if(error){
+    if (error) {
 
       console.log(error);
-
       setLoading(false);
-
       return;
 
     }
 
 
-
-
     setProducts(data as Product[]);
-
     setLoading(false);
-
 
   }
 
 
 
+  const filteredProducts = useMemo(() => {
+
+    if (selectedCategory === "الكل")
+      return products;
+
+
+    return products.filter(
+      (product) =>
+        product.category === selectedCategory
+    );
+
+
+  }, [products, selectedCategory]);
 
 
 
 
 
-  if(loading){
+  if (loading) {
 
     return (
 
       <div className="
       min-h-screen
       flex
-      justify-center
       items-center
+      justify-center
+      text-2xl
+      font-bold
+      text-pink-600
       ">
 
         جاري تحميل المنتجات...
@@ -117,199 +115,311 @@ export default function ProductsPage(){
 
 
 
-
-
   return (
 
     <main className="
     min-h-screen
-    bg-gray-50
-    p-6
+    bg-gradient-to-b
+    from-pink-50
+    via-white
+    to-white
+    py-12
+    px-6
     ">
 
 
-      <h1 className="
-      text-4xl
-      font-bold
-      text-pink-600
-      mb-10
-      text-center
+      <div className="
+      max-w-7xl
+      mx-auto
       ">
 
-        جميع المنتجات 🛍️
 
-      </h1>
+        <h1 className="
+        text-5xl
+        font-black
+        text-center
+        text-pink-600
+        ">
+
+          {selectedCategory === "الكل"
+            ? "جميع المنتجات 🛍️"
+            : `قسم ${selectedCategory}`}
+
+        </h1>
 
 
 
+        <p className="
+        text-center
+        text-gray-500
+        mt-4
+        text-lg
+        ">
+
+          اكتشف أحدث المنتجات المختارة بعناية
+
+        </p>
 
 
-
-
-      {
-        products.length === 0 ?
 
 
         <div className="
-        bg-white
-        p-10
-        rounded-3xl
-        shadow
-        text-center
+        flex
+        flex-wrap
+        justify-center
+        gap-4
+        mt-10
+        mb-12
         ">
 
-          لا يوجد منتجات
+
+          {categories.map((category)=>{
+
+
+            const count =
+              category === "الكل"
+              ? products.length
+              : products.filter(
+                  (p)=>p.category === category
+                ).length;
+
+
+
+            return (
+
+              <Link
+
+              key={category}
+
+              href={
+                category === "الكل"
+                ? "/products"
+                : `/products?category=${encodeURIComponent(category)}`
+              }
+
+
+              className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${
+                selectedCategory === category
+                ? "bg-pink-600 text-white shadow-xl scale-105"
+                : "bg-white hover:bg-pink-100 text-gray-700 shadow"
+              }`}
+
+              >
+
+                {category} ({count})
+
+              </Link>
+
+            );
+
+
+          })}
+
 
         </div>
 
 
 
-        :
 
 
 
-        <div className="
-        grid
-        md:grid-cols-4
-        gap-6
-        ">
+        {filteredProducts.length === 0 ? (
 
+          <div className="
+          bg-white
+          rounded-3xl
+          shadow-xl
+          p-16
+          text-center
+          ">
 
-
-        {
-          products.map(product=>(
-
-
-            <div
-
-            key={product.id}
-
-            className="
-            bg-white
-            rounded-3xl
-            shadow
-            overflow-hidden
-            hover:shadow-xl
-            transition
+            <h2 className="
+            text-3xl
+            font-bold
+            text-gray-500
             ">
 
+              لا توجد منتجات داخل هذا القسم حالياً
+
+            </h2>
+
+          </div>
 
 
+        ) : (
 
 
-              <img
+          <div className="
+          grid
+          md:grid-cols-2
+          lg:grid-cols-4
+          gap-8
+          ">
 
-              src={product.image}
 
-              alt={product.name}
+            {filteredProducts.map((product)=>(
+
+
+              <div
+
+              key={product.id}
 
               className="
-              w-full
-              h-72
-              object-cover
-              "
+              bg-white
+              rounded-3xl
+              overflow-hidden
+              shadow-lg
+              hover:shadow-pink-300
+              hover:-translate-y-2
+              duration-300
+              ">
 
-              />
+                <img
 
+                src={product.image}
 
-
-
-
-
-              <div className="p-5">
-
-
-
-                <p className="
-                text-pink-600
-                ">
-
-                  {product.category}
-
-                </p>
-
-
-
-
-
-                <h2 className="
-                text-xl
-                font-bold
-                mt-2
-                ">
-
-                  {product.name}
-
-                </h2>
-
-
-
-
-
-
-                <p className="
-                font-bold
-                mt-3
-                ">
-
-                  {product.price} جنيه
-
-                </p>
-
-
-
-
-
-
-                <Link
-
-                href={`/product?id=${product.id}`}
+                alt={product.name}
 
                 className="
-                block
-                mt-5
-                bg-black
-                text-white
-                text-center
-                py-3
-                rounded-xl
+                w-full
+                h-72
+                object-cover
                 "
 
-                >
-
-                  عرض التفاصيل
-
-                </Link>
+                />
 
 
+
+                <div className="p-5">
+
+
+                  <span className="
+                  inline-block
+                  bg-pink-100
+                  text-pink-600
+                  px-3
+                  py-1
+                  rounded-full
+                  text-sm
+                  font-bold
+                  ">
+
+                    {product.category}
+
+                  </span>
+
+
+
+                  <h2 className="
+                  text-2xl
+                  font-bold
+                  mt-4
+                  line-clamp-2
+                  ">
+
+                    {product.name}
+
+                  </h2>
+
+
+
+
+                  <p className="
+                  text-pink-600
+                  text-2xl
+                  font-black
+                  mt-4
+                  ">
+
+                    {product.price} جنيه
+
+                  </p>
+
+
+
+
+                  <Link
+
+                  href={`/product?id=${product.id}`}
+
+                  className="
+                  block
+                  mt-6
+                  text-center
+                  bg-gradient-to-r
+                  from-pink-600
+                  to-rose-500
+                  text-white
+                  py-3
+                  rounded-2xl
+                  font-bold
+                  hover:scale-105
+                  duration-300
+                  "
+
+                  >
+
+                    عرض التفاصيل
+
+                  </Link>
+
+
+
+                </div>
 
 
               </div>
 
 
+            ))}
 
 
-
-            </div>
-
+          </div>
 
 
-          ))
-
-        }
+        )}
 
 
-
-        </div>
-
-
-      }
-
+      </div>
 
 
     </main>
 
   );
 
+}
+
+
+
+
+
+export default function ProductsPage(){
+
+  return (
+
+    <Suspense
+
+    fallback={
+
+      <div className="
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      ">
+
+        جاري التحميل...
+
+      </div>
+
+    }
+
+    >
+
+      <ProductsContent />
+
+    </Suspense>
+
+  );
 
 }

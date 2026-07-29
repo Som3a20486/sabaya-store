@@ -51,6 +51,8 @@ function ProductContent(){
 
   const [product,setProduct] = useState<Product | null>(null);
 
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+
   const [loading,setLoading] = useState(true);
 
 

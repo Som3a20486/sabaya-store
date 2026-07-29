@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-
+import CategorySection from "@/components/CategorySection";
 
 
 type Product = {
@@ -202,13 +202,13 @@ function ProductImageSlider({
       alt={alt}
 
       className="
-      w-full
-      h-72
-      object-cover
-      transition-all
-      duration-700
-      "
-
+w-full
+h-72
+object-cover
+duration-700
+group-hover:scale-110
+transition-all
+"
       />
 
 
@@ -623,240 +623,155 @@ export default function HomePage(){
 
 
 
-      <section>
+      <CategorySection />
 
+<section>
 
-        <h2 className="
-        text-3xl
-        font-bold
-        mb-8
-        text-center
-        ">
+  <h2
+    className="
+    text-3xl
+    font-bold
+    mb-8
+    text-center
+    "
+  >
+    أحدث المنتجات
+  </h2>
 
-          أحدث المنتجات
+  {products.length === 0 ? (
 
-        </h2>
+    <div
+      className="
+      bg-white
+      rounded-3xl
+      shadow
+      p-10
+      text-center
+      text-gray-500
+      "
+    >
+      لا يوجد منتجات حالياً
+    </div>
 
+  ) : (
 
+    <div
+      className="
+      grid
+      md:grid-cols-2
+      lg:grid-cols-4
+      gap-8
+      "
+    >
 
+      {products.map((product) => (
 
-
-
-
-
-
-        {
-          products.length === 0 ?
-
-
-
-          <div className="
+        <div
+          key={product.id}
+          className="
           bg-white
           rounded-3xl
-          shadow
-          p-10
-          text-center
-          text-gray-500
-          ">
+          shadow-lg
+          overflow-hidden
+          hover:shadow-pink-300
+          hover:-translate-y-2
+          duration-300
+          "
+        >
 
-            لا يوجد منتجات حالياً
+<div className="group overflow-hidden relative">
 
-          </div>
+  <ProductImageSlider
+    images={product.images}
+    fallback={product.image}
+    alt={product.name}
+  />
 
+</div>
 
+<div className="p-5">
 
+  <div className="flex justify-between items-center">
 
+    <span className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-xs font-bold">
+      {product.category}
+    </span>
 
-          :
+    <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+      جديد
+    </span>
 
+  </div>
 
+  {product.images && product.images.length > 1 && (
 
+    <div className="mt-3">
 
+      <span className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
 
+        📷 {product.images.length} صور
 
-          <div className="
-          grid
-          md:grid-cols-4
-          gap-6
-          ">
+      </span>
 
+    </div>
 
+  )}
 
+  <h3 className="text-xl font-bold mt-4 line-clamp-2">
 
+    {product.name}
 
-          {
+  </h3>
 
-          products.map(product=>(
+  <p className="text-2xl font-black text-pink-600 mt-4">
 
+    {product.price} جنيه
 
+  </p>
 
-            <div
+  <Link
 
-            key={product.id}
+    href={`/product?id=${product.id}`}
 
-            className="
-            bg-white
-            rounded-3xl
-            shadow
-            overflow-hidden
-            hover:shadow-xl
-            transition
-            "
+    className="
+    mt-6
+    flex
+    items-center
+    justify-center
+    gap-2
+    w-full
+    bg-gradient-to-r
+    from-pink-600
+    to-rose-500
+    text-white
+    py-3
+    rounded-2xl
+    font-bold
+    hover:scale-105
+    duration-300
+    "
 
-            >
+  >
 
+    عرض المنتج
 
+    <span>→</span>
 
+  </Link>
 
+</div>
 
+</div>
 
-              <ProductImageSlider
+))}
 
+</div>
 
-              images={product.images}
+)}
 
+</section>
 
-              fallback={product.image}
+</main>
 
-
-              alt={product.name}
-
-
-              />
-
-
-
-
-
-
-
-
-
-              <div className="p-5">
-
-
-
-
-
-
-                <p className="
-                text-pink-600
-                text-sm
-                ">
-
-                  {product.category}
-
-                </p>
-
-
-
-
-
-
-
-                <h3 className="
-                text-xl
-                font-bold
-                mt-2
-                ">
-
-                  {product.name}
-
-                </h3>
-
-
-
-
-
-
-
-                <p className="
-                font-bold
-                text-lg
-                mt-3
-                ">
-
-                  {product.price} جنيه
-
-                </p>
-
-
-
-
-
-
-
-                <Link
-
-                href={`/product?id=${product.id}`}
-
-                className="
-                block
-                text-center
-                mt-5
-                bg-black
-                text-white
-                py-3
-                rounded-xl
-                "
-
-                >
-
-                  عرض المنتج
-
-                </Link>
-
-
-
-
-
-
-              </div>
-
-
-
-
-
-
-
-            </div>
-
-
-
-          ))
-
-          }
-
-
-
-
-
-          </div>
-
-
-
-
-
-        }
-
-
-
-
-
-
-
-      </section>
-
-
-
-
-
-
-
-    </main>
-
-
-  );
-
-
+);
 }

@@ -572,27 +572,17 @@ export default function AddProductPage(){
 
 
 
-          <select
-
-          className="border rounded-xl p-4 w-full"
-
-          value={category}
-
-          onChange={(e)=>setCategory(e.target.value)}
-
-          >
-
-            <option>ملابس</option>
-
-            <option>أحذية</option>
-
-            <option>شنط</option>
-
-            <option>إكسسوارات</option>
-
-
-          </select>
-
+        <select
+  className="border rounded-xl p-4 w-full"
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+>
+  <option value="ملابس">👗 ملابس</option>
+  <option value="أحذية">👠 أحذية</option>
+  <option value="حقائب">👜 حقائب</option>
+  <option value="إكسسوارات">💍 إكسسوارات</option>
+  <option value="إلكترونيات">📱 إلكترونيات</option>
+</select>
 
 
 
