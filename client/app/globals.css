@@ -86,64 +86,46 @@ body {
 
 
 
-@keyframes adminFloatReverse {
+@keyframes cinematicZoom {
+
+0% {
+transform: scale(1);
+}
+
+50% {
+transform: scale(1.12);
+}
+
+100% {
+transform: scale(1);
+}
+
+}
 
 
-  0% {
+.animate-cinematic {
 
-    transform: translate3d(0,0,0);
-
-  }
-
-
-  50% {
-
-    transform: translate3d(-50px,40px,0);
-
-  }
-
-
-  100% {
-
-    transform: translate3d(0,0,0);
-
-  }
-
+animation: cinematicZoom 15s infinite ease-in-out;
 
 }
 
 
 
+@keyframes lightMove {
 
-.admin-bg-shape {
+0% {
+transform: translateX(-100%);
+}
 
-
-  position: absolute;
-
-  border-radius: 9999px;
-
-  filter: blur(80px);
-
-  opacity: 0.5;
-
-  pointer-events: none;
+100% {
+transform: translateX(100%);
+}
 
 }
 
 
+.animate-light {
 
-.admin-bg-animation {
-
-
-  animation: adminFloat 10s ease-in-out infinite;
-
-}
-
-
-
-.admin-bg-animation-reverse {
-
-
-  animation: adminFloatReverse 12s ease-in-out infinite;
+animation: lightMove 6s infinite;
 
 }

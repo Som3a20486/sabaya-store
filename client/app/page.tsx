@@ -11,7 +11,7 @@ type Product = {
   id:number;
 
   name:string;
-
+  
   price:number;
 
   description:string;
@@ -532,88 +532,143 @@ export default function HomePage(){
 
 
 
-      <section className="
-      text-center
-      py-14
-      bg-pink-100
-      rounded-3xl
-      mb-10
-      ">
+ <section
+className="
+relative
+overflow-hidden
+text-center
+py-24
+px-6
+rounded-3xl
+mb-10
+shadow-xl
+"
+>
+
+
+{/* الخلفية المتحركة */}
+<div
+className="
+absolute
+inset-0
+bg-cover
+bg-center
+animate-cinematic
+"
+style={{
+backgroundImage:"url('/banner.jpg')"
+}}
+>
+</div>
 
 
 
-        <h1 className="
-        text-5xl
-        font-black
-        text-pink-600
-        ">
-
-          Sabaya Store 🛍️
-
-        </h1>
-
-
+{/* طبقة اللون */}
+<div
+className="
+absolute
+inset-0
+bg-pink-100/60
+"
+>
+</div>
 
 
 
-
-        <p className="
-        text-xl
-        mt-5
-        text-gray-700
-        ">
-
-          أناقتك تبدأ من هنا 💗
-
-        </p>
-
-
-
-
-
-
-
-        <p className="
-        mt-3
-        text-gray-600
-        ">
-
-          أحدث صيحات الموضة والحقائب والأحذية والإكسسوارات
-
-        </p>
-
-
-
-
-
-
-
-        <Link
-
-        href="/products"
-
-        className="
-        inline-block
-        mt-8
-        bg-pink-600
-        text-white
-        px-10
-        py-4
-        rounded-full
-        font-bold
-        "
-
-        >
-
-          تصفح المنتجات
-
-        </Link>
+{/* تأثير إضاءة سينمائية */}
+<div
+className="
+absolute
+inset-0
+bg-linear-to-r
+from-transparent
+via-white/20
+to-transparent
+animate-light
+"
+>
+</div>
 
 
 
 
+{/* المحتوى */}
+<div
+className="
+relative
+z-10
+"
+>
 
-      </section>
+
+<h1
+className="
+text-5xl
+md:text-6xl
+font-black
+text-pink-600
+"
+>
+Sabaya Store 🛍️
+</h1>
+
+
+
+<h2
+className="
+text-3xl
+font-bold
+mt-6
+text-gray-800
+"
+>
+أناقتك تبدأ من هنا 💗
+</h2>
+
+
+
+<p
+className="
+text-xl
+mt-5
+text-gray-700
+font-medium
+"
+>
+أحدث صيحات الموضة والحقائب والأحذية والإكسسوارات ✨
+</p>
+
+
+
+
+<Link
+
+href="/products"
+
+className="
+inline-block
+mt-10
+bg-pink-600
+text-white
+px-12
+py-4
+rounded-full
+font-bold
+shadow-xl
+hover:scale-110
+transition
+"
+
+>
+🛒 تسوق الآن
+</Link>
+
+
+
+</div>
+
+
+</section>
 
 
 
@@ -740,7 +795,7 @@ export default function HomePage(){
     justify-center
     gap-2
     w-full
-    bg-gradient-to-r
+    bg-linear-to-r
     from-pink-600
     to-rose-500
     text-white
