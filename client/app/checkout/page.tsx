@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import ShippingLabel from "@/components/ShippingLabel";
 import { toast } from "sonner";
+import { AnimatePresence, motion } from "framer-motion";
 
 type CartProduct = {
   name: string;
@@ -26,9 +27,38 @@ type LabelData = {
   total: number;
 };
 
+const governorates = [
+  "القاهرة",
+  "الجيزة",
+  "الإسكندرية",
+  "الدقهلية",
+  "البحر الأحمر",
+  "البحيرة",
+  "الفيوم",
+  "الغربية",
+  "الإسماعيلية",
+  "كفر الشيخ",
+  "مطروح",
+  "المنوفية",
+  "المنيا",
+  "القليوبية",
+  "الوادي الجديد",
+  "السويس",
+  "أسوان",
+  "أسيوط",
+  "بني سويف",
+  "بورسعيد",
+  "دمياط",
+  "الشرقية",
+  "جنوب سيناء",
+  "شمال سيناء",
+  "سوهاج",
+  "قنا",
+  "الأقصر",
+];
+
 export default function CheckoutPage() {
   const router = useRouter();
-
   const labelRef = useRef<HTMLDivElement>(null);
 
   const [name, setName] = useState("");
@@ -39,6 +69,27 @@ export default function CheckoutPage() {
 
   const [loading, setLoading] = useState(false);
   const [labelData, setLabelData] = useState<LabelData | null>(null);
+  const [cartTotal, setCartTotal] = useState(0);
+
+  useEffect(() => {
+    try {
+      const cart: CartProduct[] = JSON.parse(
+        localStorage.getItem("cart") || "[]"
+      );
+
+      const total = cart.reduce(
+        (sum: number, item: CartProduct) =>
+          sum +
+          Number(item.price) * Number(item.quantity),
+        0
+      );
+
+      setCartTotal(total);
+    } catch (error) {
+      console.error("❌ CART READ ERROR:", error);
+      setCartTotal(0);
+    }
+  }, []);
 
   async function createPDF() {
     if (!labelRef.current) {
@@ -100,12 +151,13 @@ export default function CheckoutPage() {
 
       console.log("☁️ بدء رفع البوليصة...");
 
-      const { error: uploadError } = await supabase.storage
-        .from("shipping-labels")
-        .upload(fileName, pdfBlob, {
-          contentType: "application/pdf",
-          upsert: true,
-        });
+      const { error: uploadError } =
+        await supabase.storage
+          .from("shipping-labels")
+          .upload(fileName, pdfBlob, {
+            contentType: "application/pdf",
+            upsert: true,
+          });
 
       if (uploadError) {
         console.error(
@@ -123,9 +175,10 @@ export default function CheckoutPage() {
 
       console.log("✅ تم رفع البوليصة بنجاح");
 
-      const { data: urlData } = supabase.storage
-        .from("shipping-labels")
-        .getPublicUrl(fileName);
+      const { data: urlData } =
+        supabase.storage
+          .from("shipping-labels")
+          .getPublicUrl(fileName);
 
       if (!urlData?.publicUrl) {
         console.error(
@@ -145,12 +198,13 @@ export default function CheckoutPage() {
         urlData.publicUrl
       );
 
-      const { error: updateError } = await supabase
-        .from("orders")
-        .update({
-          shipping_pdf: urlData.publicUrl,
-        })
-        .eq("id", data.orderId);
+      const { error: updateError } =
+        await supabase
+          .from("orders")
+          .update({
+            shipping_pdf: urlData.publicUrl,
+          })
+          .eq("id", data.orderId);
 
       if (updateError) {
         console.error(
@@ -320,15 +374,24 @@ export default function CheckoutPage() {
 
   return (
     <main
+      dir="rtl"
       className="
         min-h-screen
-        bg-gray-50
-        p-6
+        bg-linear-to-br
+        from-pink-50
+        via-white
+        to-purple-50
+        p-4
+        sm:p-6
       "
     >
       {labelData && (
         <div
-          className="fixed left-[-9999px] top-0"
+          className="
+            fixed
+            left-[-9999px]
+            top-0
+          "
         >
           <ShippingLabel
             ref={labelRef}
@@ -348,159 +411,550 @@ export default function CheckoutPage() {
         className="
           max-w-xl
           mx-auto
-          bg-white
-          rounded-3xl
-          shadow-xl
-          p-8
+          bg-white/95
+          backdrop-blur-xl
+          rounded-4xl
+          shadow-[0_20px_60px_rgba(219,39,119,0.12)]
+          border
+          border-pink-100
+          p-5
+          sm:p-8
         "
       >
-        <h1
-          className="
-            text-3xl
-            font-black
-            text-pink-600
-            text-center
-            mb-8
-          "
-        >
-          إتمام الطلب 🛍️
-        </h1>
+        <div className="text-center mb-8">
+          <div
+            className="
+              inline-flex
+              items-center
+              justify-center
+              w-16
+              h-16
+              rounded-2xl
+              bg-linear-to-br
+              from-pink-500
+              to-fuchsia-600
+              shadow-lg
+              shadow-pink-200
+              mb-4
+            "
+          >
+            <span className="text-3xl">
+              🛍️
+            </span>
+          </div>
 
-        <input
-          placeholder="الاسم"
-          value={name}
-          onChange={(e) =>
-            setName(e.target.value)
-          }
-          disabled={loading}
-          className="
-            w-full
-            border
-            p-4
-            rounded-xl
-            mb-4
-          "
-        />
+          <h1
+            className="
+              text-3xl
+              sm:text-4xl
+              font-black
+              bg-linear-to-r
+              from-pink-600
+              to-fuchsia-600
+              bg-clip-text
+              text-transparent
+            "
+          >
+            إتمام الطلب
+          </h1>
 
-        <input
-          placeholder="رقم الهاتف"
-          value={phone}
-          onChange={(e) =>
-            setPhone(e.target.value)
-          }
-          disabled={loading}
-          className="
-            w-full
-            border
-            p-4
-            rounded-xl
-            mb-4
-          "
-        />
+          <p className="text-gray-500 mt-2">
+            أدخل بيانات التوصيل لإتمام طلبك 💗
+          </p>
+        </div>
 
-        <select
-  value={governorate}
-  onChange={(e) =>
-    setGovernorate(e.target.value)
-  }
-  disabled={loading}
-  className="
-    w-full
-    border
-    p-4
-    rounded-xl
-    mb-4
-    bg-white
-    text-gray-800
-    outline-none
-    focus:ring-2
-    focus:ring-pink-500
-  "
->
-  <option value="">
-    اختر المحافظة
-  </option>
+        <div className="space-y-4">
+          <input
+            placeholder="الاسم"
+            value={name}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
+            disabled={loading}
+            className="
+              w-full
+              border
+              border-gray-200
+              bg-gray-50
+              p-4
+              rounded-2xl
+              outline-none
+              transition
+              focus:bg-white
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+              disabled:opacity-60
+            "
+          />
 
-  <option value="القاهرة">القاهرة</option>
-  <option value="الجيزة">الجيزة</option>
-  <option value="الإسكندرية">الإسكندرية</option>
-  <option value="الدقهلية">الدقهلية</option>
-  <option value="البحر الأحمر">البحر الأحمر</option>
-  <option value="البحيرة">البحيرة</option>
-  <option value="الفيوم">الفيوم</option>
-  <option value="الغربية">الغربية</option>
-  <option value="الإسماعيلية">الإسماعيلية</option>
-  <option value="كفر الشيخ">كفر الشيخ</option>
-  <option value="مطروح">مطروح</option>
-  <option value="المنوفية">المنوفية</option>
-  <option value="المنيا">المنيا</option>
-  <option value="القليوبية">القليوبية</option>
-  <option value="الوادي الجديد">الوادي الجديد</option>
-  <option value="السويس">السويس</option>
-  <option value="أسوان">أسوان</option>
-  <option value="أسيوط">أسيوط</option>
-  <option value="بني سويف">بني سويف</option>
-  <option value="بورسعيد">بورسعيد</option>
-  <option value="دمياط">دمياط</option>
-  <option value="الشرقية">الشرقية</option>
-  <option value="جنوب سيناء">جنوب سيناء</option>
-  <option value="شمال سيناء">شمال سيناء</option>
-  <option value="سوهاج">سوهاج</option>
-  <option value="قنا">قنا</option>
-  <option value="الأقصر">الأقصر</option>
-</select>
+          <input
+            placeholder="رقم الهاتف"
+            type="tel"
+            value={phone}
+            onChange={(e) =>
+              setPhone(e.target.value)
+            }
+            disabled={loading}
+            className="
+              w-full
+              border
+              border-gray-200
+              bg-gray-50
+              p-4
+              rounded-2xl
+              outline-none
+              transition
+              focus:bg-white
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+              disabled:opacity-60
+            "
+          />
 
-        <textarea
-          placeholder="العنوان بالتفصيل"
-          value={address}
-          onChange={(e) =>
-            setAddress(e.target.value)
-          }
-          disabled={loading}
-          className="
-            w-full
-            border
-            p-4
-            rounded-xl
-            mb-4
-          "
-        />
+          <select
+            value={governorate}
+            onChange={(e) =>
+              setGovernorate(e.target.value)
+            }
+            disabled={loading}
+            className="
+              w-full
+              border
+              border-gray-200
+              bg-gray-50
+              p-4
+              rounded-2xl
+              text-gray-800
+              outline-none
+              transition
+              focus:bg-white
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+              disabled:opacity-60
+              cursor-pointer
+            "
+          >
+            <option value="">
+              اختر المحافظة
+            </option>
 
-        <textarea
-          placeholder="ملاحظات"
-          value={notes}
-          onChange={(e) =>
-            setNotes(e.target.value)
-          }
-          disabled={loading}
-          className="
-            w-full
-            border
-            p-4
-            rounded-xl
-            mb-6
-          "
-        />
+            {governorates.map((item) => (
+              <option
+                key={item}
+                value={item}
+              >
+                {item}
+              </option>
+            ))}
+          </select>
 
-        <button
-          onClick={submitOrder}
-          disabled={loading}
-          className="
-            w-full
-            bg-pink-600
-            text-white
-            py-4
-            rounded-xl
-            font-bold
-            disabled:opacity-60
-            disabled:cursor-not-allowed
-            transition
-          "
-        >
-          {loading
-            ? "جاري تأكيد الطلب..."
-            : "تأكيد الطلب"}
-        </button>
+          <AnimatePresence>
+            {governorate && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: -15,
+                  scale: 0.96,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -10,
+                  scale: 0.97,
+                }}
+                transition={{
+                  duration: 0.4,
+                  ease: "easeOut",
+                }}
+                className="
+                  relative
+                  overflow-hidden
+                  rounded-[1.75rem]
+                  border
+                  border-pink-200
+                  bg-linear-to-br
+                  from-pink-50
+                  via-white
+                  to-fuchsia-50
+                  shadow-[0_15px_45px_rgba(219,39,119,0.13)]
+                  p-5
+                "
+              >
+                <div
+                  className="
+                    absolute
+                    -top-16
+                    -left-16
+                    w-32
+                    h-32
+                    rounded-full
+                    bg-pink-200/30
+                    blur-2xl
+                  "
+                />
+
+                <div
+                  className="
+                    absolute
+                    -bottom-16
+                    -right-16
+                    w-32
+                    h-32
+                    rounded-full
+                    bg-purple-200/30
+                    blur-2xl
+                  "
+                />
+
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-5">
+                    <div>
+                      <p
+                        className="
+                          text-xs
+                          font-bold
+                          text-pink-500
+                          mb-1
+                        "
+                      >
+                        طلبك جاهز تقريبًا ✨
+                      </p>
+
+                      <h2
+                        className="
+                          text-xl
+                          font-black
+                          text-gray-900
+                        "
+                      >
+                        ملخص طلبك 🧾
+                      </h2>
+                    </div>
+
+                    <div
+                      className="
+                        w-11
+                        h-11
+                        rounded-2xl
+                        bg-white
+                        shadow-sm
+                        border
+                        border-pink-100
+                        flex
+                        items-center
+                        justify-center
+                        text-xl
+                      "
+                    >
+                      💗
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div
+                      className="
+                        flex
+                        items-center
+                        justify-between
+                        bg-white/80
+                        rounded-2xl
+                        p-4
+                        border
+                        border-white
+                      "
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="
+                            w-10
+                            h-10
+                            rounded-xl
+                            bg-pink-100
+                            flex
+                            items-center
+                            justify-center
+                          "
+                        >
+                          🛍️
+                        </span>
+
+                        <div>
+                          <p className="text-sm font-bold text-gray-800">
+                            قيمة المنتجات
+                          </p>
+
+                          <p className="text-xs text-gray-400">
+                            إجمالي المنتجات في السلة
+                          </p>
+                        </div>
+                      </div>
+
+                      <motion.span
+                        key={cartTotal}
+                        initial={{
+                          scale: 0.8,
+                          opacity: 0,
+                        }}
+                        animate={{
+                          scale: 1,
+                          opacity: 1,
+                        }}
+                        className="
+                          font-black
+                          text-gray-900
+                          whitespace-nowrap
+                        "
+                      >
+                        {cartTotal.toLocaleString(
+                          "ar-EG"
+                        )}{" "}
+                        جنيه
+                      </motion.span>
+                    </div>
+
+                    <div
+                      className="
+                        flex
+                        items-center
+                        justify-between
+                        bg-white/80
+                        rounded-2xl
+                        p-4
+                        border
+                        border-white
+                      "
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="
+                            w-10
+                            h-10
+                            rounded-xl
+                            bg-purple-100
+                            flex
+                            items-center
+                            justify-center
+                          "
+                        >
+                          🚚
+                        </span>
+
+                        <div>
+                          <p className="text-sm font-bold text-gray-800">
+                            الشحن
+                          </p>
+
+                          <p className="text-xs text-gray-400">
+                            يتم تحديده حسب العنوان
+                          </p>
+                        </div>
+                      </div>
+
+                      <span
+                        className="
+                          font-bold
+                          text-purple-600
+                          text-sm
+                          whitespace-nowrap
+                        "
+                      >
+                        حسب العنوان 📍
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    className="
+                      h-px
+                      bg-linear-to-r
+                      from-transparent
+                      via-pink-200
+                      to-transparent
+                      my-5
+                    "
+                  />
+
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      y: 8,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    transition={{
+                      delay: 0.15,
+                    }}
+                    className="
+                      rounded-2xl
+                      bg-linear-to-r
+                      from-pink-600
+                      to-fuchsia-600
+                      text-white
+                      p-5
+                      shadow-lg
+                      shadow-pink-200
+                    "
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-pink-100">
+                          الإجمالي الحالي
+                        </p>
+
+                        <p className="text-xs text-pink-100/80 mt-1">
+                          بدون إضافة تكلفة الشحن حاليًا
+                        </p>
+                      </div>
+
+                      <div className="text-left">
+                        <motion.p
+                          key={cartTotal}
+                          initial={{
+                            scale: 0.85,
+                            opacity: 0,
+                          }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                          }}
+                          className="
+                            text-2xl
+                            sm:text-3xl
+                            font-black
+                          "
+                        >
+                          {cartTotal.toLocaleString(
+                            "ar-EG"
+                          )}
+                        </motion.p>
+
+                        <p className="text-xs text-pink-100">
+                          جنيه
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <div
+                    className="
+                      mt-4
+                      flex
+                      items-center
+                      justify-center
+                      gap-2
+                      text-xs
+                      text-gray-500
+                    "
+                  >
+                    <span>📍</span>
+
+                    <span>
+                      المحافظة المختارة:{" "}
+                      <strong className="text-pink-600">
+                        {governorate}
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <textarea
+            placeholder="العنوان بالتفصيل"
+            value={address}
+            onChange={(e) =>
+              setAddress(e.target.value)
+            }
+            disabled={loading}
+            rows={3}
+            className="
+              w-full
+              border
+              border-gray-200
+              bg-gray-50
+              p-4
+              rounded-2xl
+              outline-none
+              transition
+              resize-none
+              focus:bg-white
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+              disabled:opacity-60
+            "
+          />
+
+          <textarea
+            placeholder="ملاحظات (اختياري)"
+            value={notes}
+            onChange={(e) =>
+              setNotes(e.target.value)
+            }
+            disabled={loading}
+            rows={3}
+            className="
+              w-full
+              border
+              border-gray-200
+              bg-gray-50
+              p-4
+              rounded-2xl
+              outline-none
+              transition
+              resize-none
+              focus:bg-white
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+              disabled:opacity-60
+            "
+          />
+
+          <button
+            onClick={submitOrder}
+            disabled={loading}
+            className="
+              w-full
+              bg-linear-to-r
+              from-pink-600
+              to-fuchsia-600
+              text-white
+              py-4
+              rounded-2xl
+              font-black
+              text-lg
+              shadow-lg
+              shadow-pink-200
+              hover:shadow-xl
+              hover:shadow-pink-300
+              hover:-translate-y-0.5
+              active:translate-y-0
+              disabled:opacity-60
+              disabled:cursor-not-allowed
+              transition-all
+              duration-200
+            "
+          >
+            {loading
+              ? "جاري تأكيد الطلب..."
+              : "تأكيد الطلب 🛍️"}
+          </button>
+
+          <p className="text-center text-xs text-gray-400 pt-1">
+            💗 شكرًا لاختيارك Sabaya Store
+          </p>
+        </div>
       </div>
     </main>
   );
