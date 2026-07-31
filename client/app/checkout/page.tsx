@@ -328,11 +328,7 @@ export default function CheckoutPage() {
     >
       {labelData && (
         <div
-          className="
-            fixed
-            -left-[9999px]
-            top-0
-          "
+          className="fixed left-[-9999px] top-0"
         >
           <ShippingLabel
             ref={labelRef}
@@ -402,21 +398,57 @@ export default function CheckoutPage() {
           "
         />
 
-        <input
-          placeholder="المحافظة"
-          value={governorate}
-          onChange={(e) =>
-            setGovernorate(e.target.value)
-          }
-          disabled={loading}
-          className="
-            w-full
-            border
-            p-4
-            rounded-xl
-            mb-4
-          "
-        />
+        <select
+  value={governorate}
+  onChange={(e) =>
+    setGovernorate(e.target.value)
+  }
+  disabled={loading}
+  className="
+    w-full
+    border
+    p-4
+    rounded-xl
+    mb-4
+    bg-white
+    text-gray-800
+    outline-none
+    focus:ring-2
+    focus:ring-pink-500
+  "
+>
+  <option value="">
+    اختر المحافظة
+  </option>
+
+  <option value="القاهرة">القاهرة</option>
+  <option value="الجيزة">الجيزة</option>
+  <option value="الإسكندرية">الإسكندرية</option>
+  <option value="الدقهلية">الدقهلية</option>
+  <option value="البحر الأحمر">البحر الأحمر</option>
+  <option value="البحيرة">البحيرة</option>
+  <option value="الفيوم">الفيوم</option>
+  <option value="الغربية">الغربية</option>
+  <option value="الإسماعيلية">الإسماعيلية</option>
+  <option value="كفر الشيخ">كفر الشيخ</option>
+  <option value="مطروح">مطروح</option>
+  <option value="المنوفية">المنوفية</option>
+  <option value="المنيا">المنيا</option>
+  <option value="القليوبية">القليوبية</option>
+  <option value="الوادي الجديد">الوادي الجديد</option>
+  <option value="السويس">السويس</option>
+  <option value="أسوان">أسوان</option>
+  <option value="أسيوط">أسيوط</option>
+  <option value="بني سويف">بني سويف</option>
+  <option value="بورسعيد">بورسعيد</option>
+  <option value="دمياط">دمياط</option>
+  <option value="الشرقية">الشرقية</option>
+  <option value="جنوب سيناء">جنوب سيناء</option>
+  <option value="شمال سيناء">شمال سيناء</option>
+  <option value="سوهاج">سوهاج</option>
+  <option value="قنا">قنا</option>
+  <option value="الأقصر">الأقصر</option>
+</select>
 
         <textarea
           placeholder="العنوان بالتفصيل"

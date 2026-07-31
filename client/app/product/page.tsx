@@ -86,6 +86,7 @@ function ProductContent(){
     else{
 
       setLoading(false);
+      
 
     }
 
@@ -117,7 +118,7 @@ function ProductContent(){
     if(error){
 
       console.log(error);
-
+      
       setLoading(false);
 
       return;
@@ -357,7 +358,7 @@ function ProductContent(){
 
           className="
           w-full
-          h-[500px]
+          h-125
           object-cover
           rounded-3xl
           "
