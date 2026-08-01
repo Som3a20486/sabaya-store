@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import { Cairo } from "next/font/google";
 import ContactBubble from "@/components/ContactBubble";
 import { Toaster } from "sonner";
-
+import VisitorTracker from "@/components/VisitorTracker";
 
 const cairo = Cairo({
 
@@ -61,104 +61,53 @@ export default function RootLayout({
 
 
       <body className={cairo.className}>
-
-
-        <Providers>
-
-
-          <ContactBubble />
-
-
-
-          <Header />
-
-
-
-          <Toaster
-
-            position="top-center"
-
-            richColors
-
-            duration={3000}
-
-          />
-
-
-
-
-
-          <main>
-
-            {children}
-
-          </main>
-
-
-
-
-
-
-
-          <footer className="
-          bg-pink-600
-          text-white
-          text-center
-          py-8
-          mt-10
-          ">
-
-
-
-            <h2 className="
-            text-3xl
-            font-bold
-            ">
-
-              ✦ Sabaya Store ✦
-
-            </h2>
-
-
-
-
-
-
-            <p className="mt-3">
-
-              أناقة تبدأ من هنا 💗
-
-            </p>
-
-
-
-
-
-
-
-            <p className="mt-2 text-sm">
-
-              جميع الحقوق محفوظة © 2026
-
-            </p>
-
-
-
-
-
-
-          </footer>
-
-
-
-
-
-        </Providers>
-
-
-
-
-      </body>
+  <Providers>
+
+    <VisitorTracker />
+
+    <ContactBubble />
+
+    <Header />
+
+    <Toaster
+      position="top-center"
+      richColors
+      duration={3000}
+    />
+
+    <main>
+      {children}
+    </main>
+
+    <footer
+      className="
+      bg-pink-600
+      text-white
+      text-center
+      py-8
+      mt-10
+      "
+    >
+      <h2
+        className="
+        text-3xl
+        font-bold
+        "
+      >
+        ✦ Sabaya Store ✦
+      </h2>
+
+      <p className="mt-3">
+        أناقة تبدأ من هنا 💗
+      </p>
+
+      <p className="mt-2 text-sm">
+        جميع الحقوق محفوظة © 2026
+      </p>
+    </footer>
+
+  </Providers>
+</body>
 
 
 
